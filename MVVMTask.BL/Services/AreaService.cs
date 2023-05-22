@@ -1,4 +1,5 @@
-﻿using MVVMTask.BL.Models;
+﻿using Microsoft.Extensions.Logging;
+using MVVMTask.BL.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -14,9 +15,12 @@ namespace MVVMTask.BL.Services
     
     public class AreaService : IAreaService
     {
+        private ILogger<AreaService> areaServiceLogger;
         public HttpClient ApiClient { get; set; }
-        public AreaService()
+        public AreaService(ILogger<AreaService> logger)
         {
+            areaServiceLogger = logger;
+
             HttpClient client = new HttpClient();
             ApiClient = client;
             ApiClient.BaseAddress = new Uri("https://api-dbw.stat.gov.pl/api/1.1.0/");
@@ -24,43 +28,59 @@ namespace MVVMTask.BL.Services
 
         public async Task<IEnumerable<Area>> GetAreas()
         {
-            HttpResponseMessage response = await ApiClient.GetAsync("area/area-area");
-            response.EnsureSuccessStatusCode();
+            try
+            {
+                HttpResponseMessage response = await ApiClient.GetAsync("area/area-area");
+                response.EnsureSuccessStatusCode();
 
-            string responseBody = await response.Content.ReadAsStringAsync();
-            JsonSerializer serializer = new JsonSerializer();
-            var deserialized = serializer.Deserialize(new JsonTextReader(new StringReader(responseBody)));
-            JArray array = (JArray)deserialized;
+                string responseBody = await response.Content.ReadAsStringAsync();
+                JsonSerializer serializer = new JsonSerializer();
+                var deserialized = serializer.Deserialize(new JsonTextReader(new StringReader(responseBody)));
+                JArray array = (JArray)deserialized;
 
-            IList<Area> areaList = MapJsonToAreas(array);
+                IList<Area> areaList = MapJsonToAreas(array);
 
-            return areaList;
+                return areaList;
+            }
+            catch(Exception ex)
+            {
+                areaServiceLogger.LogError(ex.Message);
+                throw;
+            }
         }
 
         private IList<Area> MapJsonToAreas(JArray areaArray)
         {
-            IList<Area> areaList = new List<Area>();
-            foreach (JObject area in areaArray)
+            try
             {
-                Area newArea = new Area();
-                newArea.Id = area["id"].ToObject<int>();
-                newArea.Name = area["nazwa"].ToString();
-                if (area["id-nadrzedny-element"] != null)
+                IList<Area> areaList = new List<Area>();
+                foreach (JObject area in areaArray)
                 {
-                    newArea.PrecendentLevelId = area["id-nadrzedny-element"].ToObject<int>();
-                }
-                else
-                {
-                    newArea.PrecendentLevelId = null;
-                }
-                newArea.LevelId = area["id-poziom"].ToObject<int>();
-                newArea.LevelName = area["nazwa-poziom"].ToString();
-                newArea.IsEditable = area["czy-zmienne"].ToObject<bool>();
+                    Area newArea = new Area();
+                    newArea.Id = area["id"].ToObject<int>();
+                    newArea.Name = area["nazwa"].ToString();
+                    if (area["id-nadrzedny-element"] != null)
+                    {
+                        newArea.PrecendentLevelId = area["id-nadrzedny-element"].ToObject<int>();
+                    }
+                    else
+                    {
+                        newArea.PrecendentLevelId = null;
+                    }
+                    newArea.LevelId = area["id-poziom"].ToObject<int>();
+                    newArea.LevelName = area["nazwa-poziom"].ToString();
+                    newArea.IsEditable = area["czy-zmienne"].ToObject<bool>();
 
-                areaList.Add(newArea);
+                    areaList.Add(newArea);
+                }
+
+                return areaList;
             }
-
-            return areaList;
+            catch( Exception ex )
+            {
+                areaServiceLogger.LogError(ex.Message);
+                throw;
+            }
         }
     }
 }
