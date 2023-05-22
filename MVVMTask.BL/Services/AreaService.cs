@@ -49,7 +49,7 @@ namespace MVVMTask.BL.Services
             }
         }
 
-        private IList<Area> MapJsonToAreas(JArray areaArray)
+        public IList<Area> MapJsonToAreas(JArray areaArray)
         {
             try
             {

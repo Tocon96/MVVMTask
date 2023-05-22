@@ -1,4 +1,5 @@
 ﻿using MVVMTask.BL.Models;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,6 @@ namespace MVVMTask.BL.Services
     public interface IAreaService
     {
         Task<IEnumerable<Area>> GetAreas();
+        IList<Area> MapJsonToAreas(JArray areaArray);
     }
 }
