@@ -7,6 +7,30 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-
+        <DataGrid Name="AreasDatagrid" ItemsSource="{Binding Areas}" AutoGenerateColumns="False">
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding LevelName}" Value="Temat" >
+                            <Setter Property="Background" Value="Green"></Setter>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding LevelName}" Value="Zakres informacyjny" >
+                            <Setter Property="Background" Value="Red"></Setter>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding LevelName}" Value="Dziedzina" >
+                            <Setter Property="Background" Value="Yellow"></Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Id}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Nazwa" Width="*" Binding="{Binding Name}"></DataGridTextColumn>
+                <DataGridTextColumn Header="ID-Nadrzędny-Poziom" Width="150" Binding="{Binding PrecendentLevelId}"></DataGridTextColumn>
+                <DataGridTextColumn Header="ID-Poziom" Width="50" Binding="{Binding LevelId}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Nazwa-Poziom" Width="*" Binding="{Binding LevelName}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Czy-Zmienne" Width="200" Binding="{Binding IsEditable}"></DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Window>
