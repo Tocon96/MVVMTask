@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -15,22 +16,25 @@ namespace MVVMTask.BL.Services
     
     public class AreaService : IAreaService
     {
-        private ILogger<AreaService> areaServiceLogger;
+        private ILogger logger;
         public HttpClient ApiClient { get; set; }
-        public AreaService(ILogger<AreaService> logger)
+        public AreaService(ILogger logger)
         {
-            areaServiceLogger = logger;
+            this.logger = logger;
 
             HttpClient client = new HttpClient();
             ApiClient = client;
-            ApiClient.BaseAddress = new Uri("https://api-dbw.stat.gov.pl/api/1.1.0/");
         }
 
         public async Task<IEnumerable<Area>> GetAreas()
         {
             try
             {
-                HttpResponseMessage response = await ApiClient.GetAsync("area/area-area");
+                var appSettings = ConfigurationManager.AppSettings;
+
+                ApiClient.BaseAddress = new Uri(appSettings["ApiBaseAddress"]);
+
+                HttpResponseMessage response = await ApiClient.GetAsync(appSettings["AreaApiCall"]);
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = await response.Content.ReadAsStringAsync();
@@ -44,7 +48,7 @@ namespace MVVMTask.BL.Services
             }
             catch(Exception ex)
             {
-                areaServiceLogger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }
         }
@@ -78,7 +82,7 @@ namespace MVVMTask.BL.Services
             }
             catch( Exception ex )
             {
-                areaServiceLogger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }
         }

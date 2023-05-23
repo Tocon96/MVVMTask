@@ -4,6 +4,6 @@
              xmlns:local="clr-namespace:MVVMTask.UI"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        
     </Application.Resources>
 </Application>

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using MVVMTask.BL.Models;
+﻿using MVVMTask.BL.Models;
 using MVVMTask.BL.Services;
 using System;
 using System.Collections.Generic;
@@ -31,9 +30,8 @@ namespace MVVMTask.BL.ViewModels
 
         public MainWindowViewModel()
         {
-            LoggerFactory factory = new LoggerFactory();
-            ILogger<AreaService> areaServiceLogger = factory.CreateLogger<AreaService>();
-            IAreaService Service = new AreaService(areaServiceLogger);
+            ILogger logger = new Logger();
+            IAreaService Service = new AreaService(logger);
             IEnumerable<Area> areaList = Task.Run(async () => await Service.GetAreas()).Result;
             Areas = new ObservableCollection<Area>(areaList);
         }
